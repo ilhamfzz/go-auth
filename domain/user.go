@@ -14,11 +14,14 @@ type User struct {
 }
 
 type UserRepository interface {
+	Create(ctx context.Context, user User) (User, error)
 	FindByID(ctx context.Context, id int64) (User, error)
 	FindByUsername(ctx context.Context, username string) (User, error)
+	GetLastID(ctx context.Context) (int64, error)
 }
 
 type UserService interface {
+	Register(ctx context.Context, req dto.RegisterReq) (dto.RegisterRes, error)
 	Authenticate(ctx context.Context, req dto.AuthReq) (dto.AuthRes, error)
 	ValidateToken(ctx context.Context, token string) (dto.UserData, error)
 }

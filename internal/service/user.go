@@ -22,6 +22,37 @@ func NewUser(userRepo domain.UserRepository, cacheRepo domain.CacheRepository) d
 	}
 }
 
+func (u userService) Register(ctx context.Context, req dto.RegisterReq) (dto.RegisterRes, error) {
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
+	if err != nil {
+		return dto.RegisterRes{}, domain.ErrInternalServerError
+	}
+
+	userDomain := domain.User{
+		FullName: req.FullName,
+		Phone:    req.Phone,
+		Username: req.Username,
+		Password: string(hashedPassword),
+	}
+
+	user, err := u.userRepo.Create(ctx, userDomain)
+	if err != nil {
+		return dto.RegisterRes{}, domain.ErrInternalServerError
+	}
+
+	id, err := u.userRepo.GetLastID(ctx)
+	if err != nil {
+		return dto.RegisterRes{}, domain.ErrInternalServerError
+	}
+
+	return dto.RegisterRes{
+		ID:       id,
+		FullName: user.FullName,
+		Phone:    user.Phone,
+		Username: user.Username,
+	}, nil
+}
+
 func (u userService) Authenticate(ctx context.Context, req dto.AuthReq) (dto.AuthRes, error) {
 	user, err := u.userRepo.FindByUsername(ctx, req.Username)
 	if err != nil {

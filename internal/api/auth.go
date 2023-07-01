@@ -17,8 +17,23 @@ func NewAuth(app *fiber.App, userService domain.UserService, authMiddleware fibe
 		userService: userService,
 	}
 
+	app.Post("register", api.Register)
 	app.Post("token/generate", api.GenerateToken)
 	app.Get("token/validate", authMiddleware, api.ValidateToken)
+}
+
+func (a authApi) Register(ctx *fiber.Ctx) error {
+	var req dto.RegisterReq
+	if err := ctx.BodyParser(&req); err != nil {
+		return ctx.SendStatus(fiber.StatusBadRequest)
+	}
+
+	user, err := a.userService.Register(ctx.Context(), req)
+	if err != nil {
+		return ctx.SendStatus(util.GetHttpStatusCode(err))
+	}
+
+	return ctx.Status(fiber.StatusCreated).JSON(user)
 }
 
 func (a authApi) GenerateToken(ctx *fiber.Ctx) error {
