@@ -40,8 +40,10 @@ func DatabaseConnection(cnf *config.Config) *sql.DB {
 		id integer NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
 		full_name VARCHAR(255) NOT NULL,
 		phone VARCHAR(255) NOT NULL,
-		username VARCHAR(255) NOT NULL,
-		password VARCHAR(255) NOT NULL);
+		email VARCHAR(255) NOT NULL UNIQUE,
+		username VARCHAR(255) NOT NULL UNIQUE,
+		password VARCHAR(255) NOT NULL,
+		email_verified_at TIMESTAMP DEFAULT NULL);
 		`)
 	if err != nil {
 		log.Fatalf("Error when create table users %s", err.Error())

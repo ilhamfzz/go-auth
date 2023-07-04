@@ -1,45 +1,66 @@
 # Golang Authentication
 
 ## Description
-Implementing authentication in Golang withouth using jwt. The idea is to use a token that is generated with the user's data and then validate it with the data in the database using bearer authorization. This code using Fiber framework and PGSQl database.
+Implementing Register and authentication in Golang with email otp and withouth using jwt. The idea is to use a refrence id and otp to validate the user. the refrence id, otp, and time otp expired will be stored in cache. This is useful for matching the data submitted for user validation. After user validated, you can generate a token, This feature is usually used to login user. You will get token and using it with Bearer Authorization to get user data.
 
-## How to test
-1. Clone this repository
-2. Create a database in PostgreSQL with the name "go-auth"
-3. Create a .env file and fill it with the following data:
-```
-SERVER_HOST=localhost
-SERVER_PORT=8080
-
-DB_HOST=localhost
-DB_PORT=5432
-DB_USER=postgres
-DB_PASSWORD=<your password>
-DB_NAME=go-auth
-```
-4. Run the following commands:
-```
-go mod tidy
-go run main.go
-```
+## Frameworks
+- HTTP framework : Fiber
+- SQL builder : Goqu
+- Database : PostgreSQL
+- Cache : BigCache
+- Email : Mailtrap
 
 ## Features
 ### Register
+This will register a new user and send an OTP to the user's email. But in this repository environtment, i am using sandbox (testing) email from mailtrap. So, you can't get the OTP. But you can see the OTP in the console. You can change the credential with prefix `MAIL_` in `.env` file.
 #### Endpoint
 ```
-http://localhost:8080/register
+http://localhost:8080/user/register
 ```
 #### Method
 ```
 POST
 ```
-#### Body JSON
+#### Input Body JSON
 ```
 {
-    "full_name": "<VARCHAR(256)>",
-    "phone": "<VARCHAR(256)>",
-    "username": "<VARCHAR(256)>",
-    "password": "<VARCHAR(256)>"
+    "full_name": "<VARCHAR(255)>",
+    "phone": "<VARCHAR(255)>",
+    "email": "<VARCHAR(255)>",
+    "username": "<VARCHAR(255)>",
+    "password": "<VARCHAR(255)>"
+}
+```
+
+#### Expected Output Body JSON
+```
+{
+    "id": "<your registered id>",
+    "full_name": "<your registered full name>",
+    "phone": "<your registered phone>",
+    "email": "<your registered email>",
+    "username": "<your input username>",
+    "refrence_id": "<your refrerence id>",
+}
+```
+
+### Validate OTP
+This will validate your account using refrence id and OTP that you can get frome result of register endpoint and your email (in this repo, you can get otp from console).
+#### Endpoint
+```
+http://localhost:8080/user/validate-otp
+```
+
+#### Method
+```
+POST
+```
+
+#### Input Body JSON
+```
+{
+    "refrence_id": "<your reference id>",
+    "otp": "<your otp>"
 }
 ```
 ### Generate Token
@@ -52,11 +73,18 @@ http://localhost:8080/token/generate
 ```
 POST
 ```
-#### Body JSON
+#### Input Body JSON
 ```
 {
     "username": "<your username>",
     "password": "<your password>"
+}
+```
+
+#### Expected Output Body JSON
+```
+{
+    "token": "<your token>"
 }
 ```
 
@@ -73,3 +101,19 @@ GET
 ```
 Bearer <token>
 ```
+
+## Documentation
+### Register
+![Register](https://github.com/ilhamfzz/go-auth/assets/94663388/0ff823fc-22ee-43ee-b432-75c2da757daf)
+
+### Get Email OTP
+![Get Email OTP](https://github.com/ilhamfzz/go-auth/assets/94663388/9c3f26d8-44d4-483d-8e08-dd03c1f77494)
+
+### Validate OTP
+![Validate OTP](https://github.com/ilhamfzz/go-auth/assets/94663388/2151f51d-34bf-423a-8b4d-ac3130930534)
+
+### Generate Token
+![Generate Token](https://github.com/ilhamfzz/go-auth/assets/94663388/2151f51d-34bf-423a-8b4d-ac3130930534)
+
+### Validate Token
+![Validate Token](https://github.com/ilhamfzz/go-auth/assets/94663388/11210e2a-d910-4bb5-a245-ffaf0071729f)

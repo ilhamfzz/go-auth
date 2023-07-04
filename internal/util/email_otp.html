@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Kode OTP Jajanin.Sinii</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-image: url('https://i.ibb.co/CBVZb7r/3288900.jpg');
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-position: center;
+            text-align: center;
+            padding: 50px;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo {
+            margin-bottom: 20px;
+            width: 250px;
+            height: 250px;
+        }
+
+        .otp-code {
+            display: inline-block;
+            padding: 8px;
+          	padding-right: 12px;
+          	padding-left: 12px;
+            background-color: #FF5733;
+            color: #ffffff;
+            font-size: 24px;
+            border-radius: 5px;
+        }
+
+        p {
+            color: #333333;
+            margin-bottom: 10px;
+          	font-size:12px;
+        }
+
+        .footer {
+            margin-top: 20px;
+            color: #999999;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img class="logo" src="https://i.ibb.co/3MZ7PCB/Main-Logo-1x1-3.jpg" style="max-width: 100%; height: auto;" alt="Jajanin.Sinii Logo">
+        <p>Terima kasih telah menggunakan layanan Jajanin.Sinii. Berikut adalah kode OTP Anda:</p>
+        <!-- sesuaikan ukuran otp codenya sesuai presentase pengecilan logo diatas -->
+        <div class="otp-code">{{ .OTP }}</div>
+        <p>Kode ini akan berlaku selama 5 menit. Harap jangan berikan kode ini kepada siapapun.</p>
+        <p>Jika Anda tidak meminta kode ini, silakan abaikan email ini.</p>
+        <p class="footer">Terima kasih.</p>
+    </div>
+</body>
+</html>

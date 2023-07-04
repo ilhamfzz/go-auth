@@ -18,27 +18,44 @@ func NewUser(con *sql.DB) domain.UserRepository {
 	}
 }
 
-func (u userRepository) Create(ctx context.Context, user domain.User) (domain.User, error) {
+func (u userRepository) Create(ctx context.Context, user *domain.User) (domain.User, error) {
 	dataset := u.db.Insert("users").
-		Cols("full_name", "phone", "username", "password").
+		Cols("full_name", "phone", "email", "username", "password").
 		Vals(goqu.Vals{
 			user.FullName,
 			user.Phone,
+			user.Email,
 			user.Username,
 			user.Password,
-		})
+		}).Executor()
 
-	sql, _, err := dataset.ToSQL() // Generate the SQL statement
+	_, err := dataset.ExecContext(ctx)
 	if err != nil {
 		return domain.User{}, err
 	}
 
-	_, err = u.db.ExecContext(ctx, sql) // Execute the SQL statement
-	if err != nil {
-		return domain.User{}, err
+	return *user, nil
+}
+
+func (u userRepository) Update(ctx context.Context, user *domain.User) error {
+	user.EmailVerifiedAtDB = sql.NullTime{
+		Time:  user.EmailVerifiedAt,
+		Valid: true,
 	}
 
-	return user, nil
+	dataset := u.db.Update("users").Where(goqu.Ex{
+		"id": user.ID,
+	}).Set(goqu.Record{
+		"full_name":         user.FullName,
+		"phone":             user.Phone,
+		"email":             user.Email,
+		"username":          user.Username,
+		"password":          user.Password,
+		"email_verified_at": user.EmailVerifiedAtDB,
+	}).Executor()
+
+	_, err := dataset.ExecContext(ctx)
+	return err
 }
 
 func (u userRepository) FindByID(ctx context.Context, id int64) (user domain.User, err error) {
@@ -53,6 +70,15 @@ func (u userRepository) FindByID(ctx context.Context, id int64) (user domain.Use
 func (u userRepository) FindByUsername(ctx context.Context, username string) (user domain.User, err error) {
 	dataset := u.db.From("users").Where(goqu.Ex{
 		"username": username,
+	})
+
+	_, err = dataset.ScanStructContext(ctx, &user)
+	return
+}
+
+func (u userRepository) FindByEmail(ctx context.Context, email string) (user domain.User, err error) {
+	dataset := u.db.From("users").Where(goqu.Ex{
+		"email": email,
 	})
 
 	_, err = dataset.ScanStructContext(ctx, &user)
